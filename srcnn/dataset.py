@@ -10,7 +10,6 @@ class TinySRDataset(Dataset):
         self.filepath = pd.read_csv(meta_info, sep=",", header=None)
         self.root = root
         self.transfroms = transforms.Compose([
-            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             # transforms.Normalize(mean, std)
         ])

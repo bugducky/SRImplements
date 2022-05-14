@@ -3,14 +3,13 @@ from torchvision.utils import save_image
 from dataset import *
 from model import *
 from torch.utils.data import DataLoader
-from torch.optim import SGD
+from torch.optim import SGD,Adam
 import wandb
 from torch import nn
 
-LR = 0.001
-MOMENTUM = 0.9
-BS = 32
-EPOCH = 1000
+LR = 0.0001
+BS = 8
+EPOCH = 100
 PROJECT = "srcnn"
 
 os.makedirs("exp/training", exist_ok=True)
@@ -21,7 +20,8 @@ dataset = TinySRDataset("D:\\code\\deeplearning\\SRTinyDataset\\dataset\\bsds200
 train_iter = DataLoader(dataset, batch_size=BS, shuffle=True)
 
 net = SRCnnModel(padding=1)
-optim = SGD(net.parameters(), lr=LR, momentum=MOMENTUM)
+# optim = SGD(net.parameters(), lr=LR, momentum=MOMENTUM)
+optim = Adam(net.parameters(), lr=LR)
 lossfn = nn.MSELoss()
 
 wandb.init(project=PROJECT)
@@ -38,15 +38,18 @@ for epoch in range(EPOCH + 1):
         optim.zero_grad()
         loss = lossfn(img_hr, y)
         loss.backward()
-        if batches_done%100==0:
+        if batches_done%20==0:
             wandb.log({"mse loss": loss.item()})
             print(f"[iters: {batches_done}, loss: {loss.item()}")
         optim.step()
         batches_done += 1
-        if batches_done % 1000 == 0:
+        if batches_done % 500 == 0:
+            y = torch.clamp(y, 0, 255)
+            img_lr = torch.clamp(img_lr, 0, 255)
             img_grid = torch.cat((img_lr, y), -1)
             img = np.array(y.cpu().detach())[0]
-            cv2.imwrite("latest.png", np.transpose(img, (1, 2, 0))*255.0)
-            save_image(img_grid, f"exp/training/{epoch}.png", nrow=1, normalize=False)
-            image = wandb.Image(f"exp/training/{epoch}.png", caption=f"{batches_done}.png")
+            save_image(img_grid, f"exp/training/{batches_done}.png", nrow=2, normalize=False)
+            image = wandb.Image(f"exp/training/{batches_done}.png", caption=f"{batches_done}.png")
             wandb.log({"images": image})
+        if batches_done % 5000 == 0:
+            torch.save(net.state_dict(), f"exp/saved_models/iter_{batches_done}.pth")
