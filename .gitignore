@@ -1,0 +1,10 @@
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+!.gitignore
+wandb
+__pycache__
+exp
