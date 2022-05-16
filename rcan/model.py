@@ -143,7 +143,7 @@ class RCAN(nn.Module):
         super(RCAN, self).__init__()
 
         self.img_range = img_range
-        self.mean = torch.Tensor(rgb_mean).view(1, 3, 1, 1)
+        self.mean = torch.Tensor(rgb_mean).view(1, num_in_ch, 1, 1)
 
         self.conv_first = nn.Conv2d(num_in_ch, num_feat, 3, 1, 1)
         self.body = make_layer(
