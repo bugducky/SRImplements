@@ -4,7 +4,9 @@
 *.egg-info
 **/dist
 **/build
-!.gitignore
+**/.gitignore
 **/wandb
 **/__pycache__
 **/exp
+**/experiments
+**/datasets
