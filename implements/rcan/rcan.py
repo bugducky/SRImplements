@@ -98,22 +98,22 @@ class RCANModel(nn.Module):
     """
 
     def __init__(
-        self,
-        num_in_ch,
-        num_out_ch,
-        num_feat=64,
-        num_group=10,
-        num_block=16,
-        squeeze_factor=16,
-        upscale=4,
-        res_scale=1,
-        img_range=255.0,
-            # rgb_mean=(0.4488, 0.4371, 0.4040),
+            self,
+            num_in_ch,
+            num_out_ch,
+            num_feat=64,
+            num_group=10,
+            num_block=16,
+            squeeze_factor=16,
+            upscale=4,
+            res_scale=1,
+            img_range=255.0,
+            rgb_mean=(0.4488, 0.4371, 0.4040),
     ):
         super(RCANModel, self).__init__()
 
         self.img_range = img_range
-        # self.mean = torch.Tensor(rgb_mean).view(1, num_in_ch, 1, 1)
+        self.mean = torch.Tensor(rgb_mean).view(1, num_in_ch, 1, 1)
 
         self.conv_first = nn.Conv2d(num_in_ch, num_feat, 3, 1, 1)
         self.body = make_layer(
@@ -129,14 +129,14 @@ class RCANModel(nn.Module):
         self.conv_last = nn.Conv2d(num_feat, num_out_ch, 3, 1, 1)
 
     def forward(self, x):
-        # self.mean = self.mean.type_as(x)
-        # x = (x - self.mean) * self.img_range
+        self.mean = self.mean.type_as(x)
 
+        x = (x - self.mean) * self.img_range
         x = self.conv_first(x)
         res = self.conv_after_body(self.body(x))
         res += x
 
         x = self.conv_last(self.upsample(res))
-        # x = x / self.img_range + self.mean
+        x = x / self.img_range + self.mean
 
         return x

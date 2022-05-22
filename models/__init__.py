@@ -1,4 +1,4 @@
-
-from .rcan import RCANModel
-from .srcnn import SRCnnModel
-from .swinir import SwinIRModel
+from .rcan import *
+from .srcnn import *
+from .srgan import *
+from .swinir import *
