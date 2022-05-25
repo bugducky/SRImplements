@@ -1,5 +1,6 @@
 from torchvision.utils import save_image
-
+from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import MultiStepLR, StepLR
 
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Adam
@@ -14,17 +15,17 @@ from models import *
 LR = 2e-4
 BS = 4
 
-PROJECT = "sun_train_swinir_adv_20220522"
-use_wandb = False
+PROJECT = "sun_train_swinir_adv_20220525"
+use_wandb = True
 
 
 in_chans = 1
-n_cpu = 0
+n_cpu = 8
 lr = 2e-4
 num_warm_up = -1
-batchsize = 4
-iter_num = 20e4
-log_interval = 10
+batchsize = 8
+iter_num = 50e4
+log_interval = 100
 sample_interval = 5e3
 checkpoint_interval = 1e4
 lr_size = 64
@@ -35,14 +36,13 @@ lambda_pixel = 1.0
 lambda_adv = 0.1
 
 
-swin_model_path = "experiments/swinir/saved_models/iter_20000.pth"
-
 os.makedirs(f"experiments/{PROJECT}/training", exist_ok=True)
 os.makedirs(f"experiments/{PROJECT}/saved_models", exist_ok=True)
 
-dataset_root = "D:\\code\\deeplearning\\dataset"
-data_dir = os.path.join(dataset_root, "sun/patch_256")
-meta_txt = os.path.join(dataset_root, "sun/patch_256/meta_info.txt")
+swin_model_path = "experiments/sun_train_swinir_20220522/saved_models/iter_500000.pth"
+dataset_root = "/home/yangqinglin/ssr/data/dataset/patch"
+data_dir = os.path.join(dataset_root, "patch_256")
+meta_txt = os.path.join(dataset_root, "patch_256/meta_info.txt")
 
 dataset = PairDataset(data_dir, meta_txt, 1)
 
@@ -83,6 +83,8 @@ if use_wandb:
 net_g = net_g.cuda()
 net_d = net_d.cuda()
 net_fe = net_fe.cuda()
+for p in net_fe.parameters():
+            p.requires_grad = False
 
 batches_done = 0
 while True:
@@ -163,7 +165,7 @@ while True:
                     loss_content.item(),
                     loss_GAN.item(),
             ))
-        
+
         # if batches_done % val_interval == 0:
         #     pass
 
