@@ -17,7 +17,7 @@ PROJECT = "sun_train_rcan_20220522"
 use_wandb = True
 
 lr = 1e-4
-batchsize = 16
+batchsize = 4
 iter_num = 10e5
 log_interval = 100
 sample_interval = 1000

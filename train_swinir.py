@@ -36,6 +36,7 @@ meta_txt = os.path.join(dataset_root, "sun/patch_256/meta_info.txt")
 dataset = PairDataset(data_dir, meta_txt, 1)
 
 train_iter = DataLoader(dataset, batch_size=batchsize, shuffle=True)
+
 net = SwinIRModel(upscale=upscale, img_size=(lr_size, lr_size), in_chans=1,
                   window_size=8, img_range=1., depths=[6, 6, 6, 6],
                   embed_dim=60, num_heads=[6, 6, 6, 6], mlp_ratio=2,

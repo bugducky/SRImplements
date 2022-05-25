@@ -63,3 +63,7 @@ def make_layer(basic_block, num_basic_block, **kwarg):
     for _ in range(num_basic_block):
         layers.append(basic_block(**kwarg))
     return nn.Sequential(*layers)
+
+
+
+
