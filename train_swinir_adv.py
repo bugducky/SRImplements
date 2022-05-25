@@ -88,8 +88,7 @@ while True:
         batches_done += 1
         img_lr, img_hr = data["lr"].cuda(), data["hr"].cuda()
 
-        
-
+        net_d.eval()
         for p in net_d.parameters():
             p.requires_grad = False
 
@@ -123,6 +122,7 @@ while True:
         loss_G.backward()
         optimizer_G.step()
 
+        net_d.train()
         for p in net_d.parameters():
             p.requires_grad = True
 
