@@ -35,7 +35,7 @@ lambda_pixel = 1.0
 lambda_adv = 0.1
 
 
-swin_model_path = "experiments\swinir\saved_models\iter_20000.pth"
+swin_model_path = "experiments/swinir/saved_models/iter_20000.pth"
 
 os.makedirs(f"experiments/{PROJECT}/training", exist_ok=True)
 os.makedirs(f"experiments/{PROJECT}/saved_models", exist_ok=True)
@@ -70,6 +70,8 @@ net_fe.eval()
 
 optimizer_G = Adam(net_g.parameters(), lr=LR, betas=[0.9, 0.99])
 optimizer_D = Adam(net_d.parameters(), lr=LR, betas=[0.9, 0.99])
+lr_desc_G = MultiStepLR(optimizer_G, [iter_num * 0.5, iter_num * 0.75, iter_num * 0.9], gamma=0.5)
+lr_desc_D = MultiStepLR(optimizer_D, [iter_num * 0.5, iter_num * 0.75, iter_num * 0.9], gamma=0.5)
 
 criterion_GAN = torch.nn.BCEWithLogitsLoss()
 criterion_content = torch.nn.L1Loss()
@@ -99,6 +101,7 @@ while True:
         if batches_done < num_warm_up:
             loss_pixel.backward()
             optimizer_G.step()
+            lr_desc_G.step()
             if batches_done % log_interval == 0:
                 if use_wandb:
                     wandb.log({"G_loss_pixel": loss_pixel.item()})
@@ -121,6 +124,7 @@ while True:
 
         loss_G.backward()
         optimizer_G.step()
+        lr_desc_G.step()
 
         net_d.train()
         for p in net_d.parameters():
@@ -139,6 +143,7 @@ while True:
 
         loss_D.backward()
         optimizer_D.step()
+        lr_desc_D.step()
 
         if batches_done % log_interval == 0:
             if use_wandb:
